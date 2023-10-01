@@ -46,3 +46,17 @@ button.accept-policy {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Right-aligned section inside the top navigation */
+.nav-right-1 {
+    position: absolute;
+    right: 2%;
+}
+.nav-right-2 {
+    position: absolute;
+    right: 7%;
+}
+.nav-right-3 {
+    position: absolute;
+    right: 10%;
+}
