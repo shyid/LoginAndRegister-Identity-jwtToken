@@ -3,6 +3,8 @@ using Auth.Identity;
 using Auth.ServiceContracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace Auth.Controllers
 {
@@ -12,14 +14,18 @@ namespace Auth.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IJwtService _jwtService;
+        private readonly IUserService _userService;
+        private IConfiguration _configuration;
         public AccountController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager, RoleManager<ApplicationRole> roleManager
-            , IJwtService jwtService)
+            , IJwtService jwtService , IConfiguration configuration, IUserService userService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _jwtService = jwtService;
+            _configuration = configuration;
+            _userService = userService;
         }
 
         public IActionResult Login()
@@ -45,7 +51,9 @@ namespace Auth.Controllers
 
                 if (user == null)
                 {
-                    return NoContent();
+                    //return NoContent();
+                    ViewBag.ErrorMessage = "User is null";
+                    return View();
                 }
 
                 //sign-in
@@ -65,7 +73,8 @@ namespace Auth.Controllers
             else
             {
                 //return Problem("Invalid email or password");
-                return View(loginDTO);
+                ViewBag.ErrorMessage ="Invalid email or password";
+                return View();
             }
             
         }
@@ -81,7 +90,9 @@ namespace Auth.Controllers
             if (ModelState.IsValid == false)
             {
                 string errorMessage = string.Join(" | ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
-                return Problem(errorMessage);
+                //return Problem(errorMessage);
+                ViewBag.ErrorMessage = errorMessage;
+                return View();
             }
             //Create user
             ApplicationUser user = new ApplicationUser()
@@ -93,9 +104,19 @@ namespace Auth.Controllers
             };
 
             IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-
+            
             if (result.Succeeded)
             {
+                var confirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                var encodedEmailToken = Encoding.UTF8.GetBytes(confirmEmailToken);
+                var validEmailToken = WebEncoders.Base64UrlEncode(encodedEmailToken);
+
+                string url = $"{_configuration["AppUrl"]}/Account/confirmemail?userid={user.Id}&token={validEmailToken}";
+
+                 await _userService.SendEmailAsync(user.Email, "Confirm your email", $"<h1>Welcome to Auth Demo</h1>" +
+                    $"<p>Please confirm your email by <a href='{url}'>Clicking here</a></p>");
+
                 //sign-in
                 await _signInManager.SignInAsync(user, isPersistent: false);
 
@@ -105,13 +126,14 @@ namespace Auth.Controllers
                 user.RefreshTokenExpirationDateTime = authenticationResponse.RefreshTokenExpirationDateTime;
                 await _userManager.UpdateAsync(user);
 
-                return RedirectToAction("Login");
+                return RedirectToAction("Index", "Home");
                 //return Ok(authenticationResponse);
             }
             else
             {
                 string errorMessage = string.Join(" | ", result.Errors.Select(e => e.Description)); //error1 | error2
-                //return Problem(errorMessage);
+                //return Problem(errorMessage);.
+                ViewBag.ErrorMessage = errorMessage;
                 return View();
             }
         }
@@ -124,5 +146,6 @@ namespace Auth.Controllers
             return RedirectToAction("Index", "Home");
             //return NoContent();
         }
+
     }
 }

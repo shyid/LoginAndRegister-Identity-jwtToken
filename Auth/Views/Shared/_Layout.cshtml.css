@@ -50,13 +50,13 @@ button.accept-policy {
 /* Right-aligned section inside the top navigation */
 .nav-right-1 {
     position: absolute;
-    right: 2%;
+    right: 20px;
 }
 .nav-right-2 {
     position: absolute;
-    right: 7%;
+    right: 100px;
 }
 .nav-right-3 {
     position: absolute;
-    right: 10%;
+    right: 250px;
 }

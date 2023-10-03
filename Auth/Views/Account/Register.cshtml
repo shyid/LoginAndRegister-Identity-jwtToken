@@ -6,8 +6,10 @@
         <div class="row text-center">
             <h1>Register</h1>
         </div>
+      
         <div class="row text-center">
-            <div asp-validation-summary="All" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger">@ViewBag.ErrorMessage</div>
+            @*<div class="text-danger">@ViewBag.ErrorMessage</div>*@
         </div>
         <div class="row">
             <div class="col-6 offset-3 pb-2">

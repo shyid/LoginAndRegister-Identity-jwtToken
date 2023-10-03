@@ -6,6 +6,9 @@
         <div class="row text-center">
             <h1>Login</h1>
         </div>
+        <div class="row text-center">          
+            <asp class="text-danger">@ViewBag.ErrorMessage</asp>
+        </div>
         <div class="row text-center">
             <div asp-validation-summary="All" class="text-danger"></div>
         </div>

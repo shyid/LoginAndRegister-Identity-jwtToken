@@ -38,7 +38,9 @@
                                     @*@UserManager.FindByEmailAsync(@User.Identity?.Name).Result.Email*@
                                     <p class="nav-link text-dark" asp-area="Account"  title="Manage">Hello @User.Identity?.Name</p>
                                 </li>
-                            
+                            <li class="nav-item nav-right-2">
+                                <a class="nav-link text-dark" asp-controller="Setting" asp-action="EditUser">Setting</a>
+                            </li>
                                 <li class="nav-item nav-right-1">
                                 <a class="nav-link text-dark" asp-controller="Account" asp-action="Logout">Logout</a>
                                 </li>

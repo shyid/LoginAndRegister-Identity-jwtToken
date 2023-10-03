@@ -14,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<IJwtService, JwtService>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
